@@ -1,0 +1,203 @@
+From 0711fe978fac54013e5763e3c2529fad14947850 Mon Sep 17 00:00:00 2001
+From: Heath123 <heath.mitchell27@gmail.com>
+Date: Fri, 8 Apr 2022 15:08:51 +0100
+Subject: [PATCH] Disable license check more thoroughly
+
+---
+ ...tore$MinecraftLicenseCheckerCallback.smali | 117 ++++++++++++------
+ 1 file changed, 81 insertions(+), 36 deletions(-)
+
+diff --git a/smali/com/mojang/minecraftpe/store/googleplay/GooglePlayStore$MinecraftLicenseCheckerCallback.smali b/smali/com/mojang/minecraftpe/store/googleplay/GooglePlayStore$MinecraftLicenseCheckerCallback.smali
+index 80dcd4f..1f84758 100644
+--- a/smali/com/mojang/minecraftpe/store/googleplay/GooglePlayStore$MinecraftLicenseCheckerCallback.smali
++++ b/smali/com/mojang/minecraftpe/store/googleplay/GooglePlayStore$MinecraftLicenseCheckerCallback.smali
+@@ -126,69 +126,114 @@
+ .end method
+ 
+ .method public applicationError(I)V
+-    .locals 5
++    .locals 6
+     .param p1, "errorCode"    # I
+ 
+     .prologue
+-    .line 104
+-    const-string/jumbo v0, "MinecraftLicenseCheckerCallback"
++    const/4 v5, 0x1
+ 
+-    const-string/jumbo v1, "error: %d"
++    .line 57
++    const/16 v1, 0x123
+ 
+-    const/4 v2, 0x1
++    if-ne p1, v1, :cond_0
+ 
+-    new-array v2, v2, [Ljava/lang/Object;
++    .line 58
++    new-instance v0, Ljava/lang/String;
++
++    const-string/jumbo v1, "LICENSED"
++
++    invoke-direct {v0, v1}, Ljava/lang/String;-><init>(Ljava/lang/String;)V
+ 
+-    const/4 v3, 0x0
++    .line 67
++    .local v0, "reason":Ljava/lang/String;
++    :goto_0
++    invoke-static {v5}, Lcom/mojang/minecraftpe/store/googleplay/GooglePlayStore;->access$002(Z)Z
+ 
+-    invoke-static {p1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++    .line 68
++    const-string/jumbo v1, "MinecraftLicenseCheckerCallback"
+ 
+-    move-result-object v4
++    const-string/jumbo v2, "allowed reason: %s"
+ 
+-    aput-object v4, v2, v3
++    new-array v3, v5, [Ljava/lang/Object;
+ 
+-    invoke-static {v1, v2}, Ljava/lang/String;->format(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
++    const/4 v4, 0x0
+ 
+-    move-result-object v1
++    aput-object v0, v3, v4
+ 
+-    invoke-static {v0, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
++    invoke-static {v2, v3}, Ljava/lang/String;->format(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
+ 
+-    .line 105
++    move-result-object v2
++
++    invoke-static {v1, v2}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
++
++    .line 69
++    invoke-static {v5}, Lcom/mojang/minecraftpe/store/googleplay/GooglePlayStore;->access$102(Z)Z
++
++    .line 70
+     return-void
++
++    .line 60
++    .end local v0    # "reason":Ljava/lang/String;
++    :cond_0
++    const/16 v1, 0x100
++
++    if-ne p1, v1, :cond_1
++
++    .line 61
++    new-instance v0, Ljava/lang/String;
++
++    const-string/jumbo v1, "LICENSED"
++
++    invoke-direct {v0, v1}, Ljava/lang/String;-><init>(Ljava/lang/String;)V
++
++    .restart local v0    # "reason":Ljava/lang/String;
++    goto :goto_0
++
++    .line 64
++    .end local v0    # "reason":Ljava/lang/String;
++    :cond_1
++    new-instance v0, Ljava/lang/String;
++
++    const-string/jumbo v1, "LICENSED"
++
++    invoke-direct {v0, v1}, Ljava/lang/String;-><init>(Ljava/lang/String;)V
++
++    .restart local v0    # "reason":Ljava/lang/String;
++    goto :goto_0
+ .end method
+ 
+ .method public dontAllow(I)V
+-    .locals 5
++    .locals 6
+     .param p1, "policyReason"    # I
+ 
+     .prologue
+-    const/4 v3, 0x1
+-
+-    const/4 v4, 0x0
++    const/4 v5, 0x1
+ 
+-    .line 85
+-    const/16 v1, 0x231
++    .line 57
++    const/16 v1, 0x123
+ 
+     if-ne p1, v1, :cond_0
+ 
+-    .line 86
++    .line 58
+     new-instance v0, Ljava/lang/String;
+ 
+-    const-string/jumbo v1, "NOT LICENSED"
++    const-string/jumbo v1, "LICENSED"
+ 
+     invoke-direct {v0, v1}, Ljava/lang/String;-><init>(Ljava/lang/String;)V
+ 
+-    .line 95
++    .line 67
+     .local v0, "reason":Ljava/lang/String;
+     :goto_0
+-    invoke-static {v3}, Lcom/mojang/minecraftpe/store/googleplay/GooglePlayStore;->access$002(Z)Z
++    invoke-static {v5}, Lcom/mojang/minecraftpe/store/googleplay/GooglePlayStore;->access$002(Z)Z
+ 
+-    .line 96
++    .line 68
+     const-string/jumbo v1, "MinecraftLicenseCheckerCallback"
+ 
+-    const-string/jumbo v2, "denied reason: %s"
++    const-string/jumbo v2, "allowed reason: %s"
+ 
+-    new-array v3, v3, [Ljava/lang/Object;
++    new-array v3, v5, [Ljava/lang/Object;
++
++    const/4 v4, 0x0
+ 
+     aput-object v0, v3, v4
+ 
+@@ -198,35 +243,35 @@
+ 
+     invoke-static {v1, v2}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+ 
+-    .line 97
+-    invoke-static {v4}, Lcom/mojang/minecraftpe/store/googleplay/GooglePlayStore;->access$102(Z)Z
++    .line 69
++    invoke-static {v5}, Lcom/mojang/minecraftpe/store/googleplay/GooglePlayStore;->access$102(Z)Z
+ 
+-    .line 98
++    .line 70
+     return-void
+ 
+-    .line 88
++    .line 60
+     .end local v0    # "reason":Ljava/lang/String;
+     :cond_0
+-    const/16 v1, 0x123
++    const/16 v1, 0x100
+ 
+     if-ne p1, v1, :cond_1
+ 
+-    .line 89
++    .line 61
+     new-instance v0, Ljava/lang/String;
+ 
+-    const-string/jumbo v1, "RETRY"
++    const-string/jumbo v1, "LICENSED"
+ 
+     invoke-direct {v0, v1}, Ljava/lang/String;-><init>(Ljava/lang/String;)V
+ 
+     .restart local v0    # "reason":Ljava/lang/String;
+     goto :goto_0
+ 
+-    .line 92
++    .line 64
+     .end local v0    # "reason":Ljava/lang/String;
+     :cond_1
+     new-instance v0, Ljava/lang/String;
+ 
+-    const-string/jumbo v1, "UNKNOWN REASON"
++    const-string/jumbo v1, "LICENSED"
+ 
+     invoke-direct {v0, v1}, Ljava/lang/String;-><init>(Ljava/lang/String;)V
+ 
+-- 
+2.35.1
+
